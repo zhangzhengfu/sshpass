@@ -72,6 +72,7 @@ struct {
 
     const char *pwprompt;
     int verbose;
+    int host_auth;
 } args;
 
 static void show_help()
@@ -83,6 +84,7 @@ static void show_help()
             "   -e            Password is passed as env-var \"SSHPASS\"\n"
             "   With no parameters - password will be taken from stdin\n\n"
             "   -P prompt     Which string should sshpass search for to detect a password prompt\n"
+            "   -y            Say 'yes' to host authentication prompt\n"
             "   -v            Be verbose about what you're doing\n"
             "   -h            Show help (this screen)\n"
             "   -V            Print version information\n"
@@ -99,6 +101,7 @@ static int parse_options( int argc, char *argv[] )
     // Set the default password source to stdin
     args.pwtype=PWT_STDIN;
     args.pwsrc.fd=0;
+    args.host_auth = 0;
 
 #define VIRGIN_PWTYPE if( args.pwtype!=PWT_STDIN ) { \
     fprintf(stderr, "Conflicting password source\n"); \
@@ -151,6 +154,9 @@ static int parse_options( int argc, char *argv[] )
 
                     error=RETURN_INVALID_ARGUMENTS;
                 }
+                break;
+            case 'y':
+                args.host_auth = 1;
                 break;
             case '?':
             case ':':
@@ -333,8 +339,11 @@ int runprogram( int argc, char *argv[] )
 
             if( selret>0 ) {
                 if( FD_ISSET( masterpt, &readfd ) ) {
-                    int ret;
-                    if( (ret=handleoutput( masterpt )) ) {
+                    int ret=handleoutput( masterpt );
+                    if ( args.verbose ) {
+                        fprintf(stderr, "SSHPASS HandleOutput ret = %d\n", ret);
+                    }
+                    if( ret ) {
                         // Authentication failed or any other error
 
                         // handleoutput returns positive error number in case of some error, and a negative value
@@ -373,10 +382,12 @@ int handleoutput( int fd )
 {
     // We are looking for the string
     static int prevmatch=0; // If the "password" prompt is repeated, we have the wrong password.
-    static int state1, state2;
+    static int state1, state2, state3;
     static int firsttime = 1;
+    static int has_send_auth = 0;
     static const char *compare1=PASSWORD_PROMPT; // Asking for a password
     static const char compare2[]="The authenticity of host "; // Asks to authenticate host
+    static const char compare3[]="Last login:"; // login success
     // static const char compare3[]="WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!"; // Warns about man in the middle attack
     // The remote identification changed error is sent to stderr, not the tty, so we do not handle it.
     // This is not a problem, as ssh exists immediately in such a case
@@ -393,12 +404,33 @@ int handleoutput( int fd )
     }
 
     int numread=read(fd, buffer, sizeof(buffer)-1 );
+    if ( numread < 0 ) { return 0; }
     buffer[numread] = '\0';
+    state1=match( compare1, buffer, numread, state1 );
+    state2=match( compare2, buffer, numread, state2 );
+    state3=match( compare3, buffer, numread, state3 );
     if( args.verbose ) {
-        fprintf(stderr, "SSHPASS read: %s\n", buffer);
+        fprintf(stderr, "SSHPASS Recv: [%s]\n", buffer);
     }
 
-    state1=match( compare1, buffer, numread, state1 );
+    if( compare3[state3] == '\0' ) {
+        if ( args.verbose ) fprintf(stderr, "SSHPASS looks like success login without password. Exiting.\n");
+        return 0;
+    }
+
+    // Are we being prompted to authenticate the host?
+    if( compare2[state2]=='\0' ) {
+        if ( ! has_send_auth ) {
+            has_send_auth = 1;
+            if ( args.host_auth ) {
+                const char yes[] = "yes\n";
+                write( fd, yes, strlen(yes) );
+            } else {
+                fprintf(stderr, "SSHPASS detected host authentication prompt. Exiting.\n");
+                ret=RETURN_HOST_KEY_UNKNOWN;
+            }
+        }
+    }
 
     // Are we at a password prompt?
     if( compare1[state1]=='\0' ) {
