@@ -8,8 +8,9 @@ you are prompted for it.
 ```bash
 git clone git://github.com/kevinburke/sshpass.git
 cd sshpass
-./configure
-make && make install
+autoreconf -f -i
+./configure --prefix=/home/lizz/app
+make -j && make install
 ```
 
 ## Notes
