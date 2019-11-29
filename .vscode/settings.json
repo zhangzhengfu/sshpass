@@ -1,0 +1,14 @@
+{
+    "files.exclude": {
+        ".deps": true,
+        ".vscode": true,
+        "AUTHORS": true,
+        "config.h": true,
+        "config.h.in~": true,
+        "config.log": true,
+        "config.status": true,
+        "COPYING": true,
+        "main.o": true,
+        "stamp*": true
+    }
+}
