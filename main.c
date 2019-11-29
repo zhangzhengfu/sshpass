@@ -68,6 +68,7 @@ struct {
     } pwsrc;
 
     const char *pwprompt;
+    const char *vcode;
     int verbose;
     int host_auth;
 } args;
@@ -104,6 +105,7 @@ static int parse_options(int argc, char *argv[]) {
         error = RETURN_CONFLICTING_ARGUMENTS;                                                                          \
     }
 
+    args.vcode = getenv("SSHVCODE");
     while ((opt = getopt(argc, argv, "+f:d:p:P:heVv")) != -1 && error == -1) {
         switch (opt) {
         case 'f':
@@ -337,7 +339,6 @@ int runprogram(int argc, char *argv[]) {
             if (selret > 0) {
                 if (FD_ISSET(masterpt, &readfd)) {
                     int ret = handleoutput(masterpt);
-                    printf("ooooo\n");
                     if (args.verbose) {
                         fprintf(stderr, "SSHPASS HandleOutput ret = %d\n", ret);
                     }
@@ -501,8 +502,7 @@ int match(const char *reference, const char *buffer, ssize_t bufsize, int state)
 void write_pass_fd(int srcfd, int dstfd);
 
 void write_verification_code(int fd) {
-    char *vcode = "681148";
-    write(fd, vcode, strlen(vcode));
+    write(fd, args.vcode, strlen(args.vcode));
     write(fd, "\n", 1);
 }
 
