@@ -502,7 +502,33 @@ int match(const char *reference, const char *buffer, ssize_t bufsize, int state)
 void write_pass_fd(int srcfd, int dstfd);
 
 void write_verification_code(int fd) {
-    write(fd, args.vcode, strlen(args.vcode));
+    char cmd[256];
+    sprintf(cmd, "oathtool --totp -b %s", args.vcode);
+
+    char buf[40];
+    FILE *fp;
+
+    if ((fp = popen(cmd, "r")) == NULL) {
+        printf("Error opening pipe!\n");
+        return -1;
+    }
+
+    while (fgets(buf, 40, fp) != NULL) {
+        if (args.verbose) {
+            fprintf(stderr, "OUTPUT VCODE: %s", buf);
+        }
+    }
+
+    if (pclose(fp)) {
+        printf("Command not found or exited with error status\n");
+        return -1;
+    }
+
+    char subbuff[7];
+    memcpy(subbuff, &buf[0], 6);
+    subbuff[6] = '\0';
+
+    write(fd, subbuff, strlen(subbuff));
     write(fd, "\n", 1);
 }
 
