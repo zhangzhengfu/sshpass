@@ -10,5 +10,13 @@
         "COPYING": true,
         "main.o": true,
         "stamp*": true
-    }
+    },
+    "cSpell.words": [
+        "ptmx",
+        "pwtype"
+    ],
+    "files.associations": {
+        "config.h": "c"
+    },
+    "C_Cpp.experimentalFeatures": "Enabled"
 }
