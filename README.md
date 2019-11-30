@@ -14,9 +14,13 @@ sshpass -e ssh user@host
 ## Install
 
 ```bash
+# dependencies
+sudo apt install oathtool
+sudo apt-get install autoconf
+
 git clone git@github.com:innerlee/sshpass.git
 cd sshpass
-autoreconf -f -i  # sudo apt-get install autoconf
+autoreconf -f -i
 ./configure --prefix=$HOME/app
 make -j && make install
 ```
