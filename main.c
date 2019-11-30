@@ -294,7 +294,6 @@ int runprogram(int argc, char *argv[]) {
 
         for (i = 0; i < argc; ++i) {
             new_argv[i] = argv[i];
-            printf("%d %s\n", i, argv[i]);
         }
 
         new_argv[i] = NULL;
@@ -334,7 +333,6 @@ int runprogram(int argc, char *argv[]) {
             FD_ZERO(&readfd);
             FD_SET(masterpt, &readfd);
             int selret = pselect(masterpt + 1, &readfd, NULL, NULL, NULL, &sigmask_select);
-            printf("selret %d\n", selret);
 
             if (selret > 0) {
                 if (FD_ISSET(masterpt, &readfd)) {
