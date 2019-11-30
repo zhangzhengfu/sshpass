@@ -20,13 +20,3 @@ autoreconf -f -i  # sudo apt-get install autoconf
 ./configure --prefix=$HOME/app
 make -j && make install
 ```
-
-## Notes
-
-This repository is a mirror of http://sourceforge.net/projects/sshpass/develop
-
-Pull requests will not be accepted
-
-##### Maintainers
-
-kevin burke <kev+sshpass@inburke.com>
