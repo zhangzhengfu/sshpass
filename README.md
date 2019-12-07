@@ -4,7 +4,7 @@ SSHpass offers you the ability to automatically offer a password via SSH when
 you are prompted for it.
 
 **NEW:**
-This fork supports google two-step authentication and auto confirmation with `yes`.
+This fork supports google *two-step authentication* and *auto confirmation* with `yes`.
 
 **NOTE:**
 Check [here](https://github.com/innerlee/setup) for one-line setup script for non-`sudo`ers.
