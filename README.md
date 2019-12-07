@@ -8,7 +8,7 @@ you are prompted for it.
 ```bash
 export SSHVCODE=YOUR_GOOGLE_AUTHE_SECRET
 export SSHPASS=YOUR_SSH_PASSWORD
-sshpass -e ssh user@host
+sshpass -e -y ssh user@host
 ```
 
 ## Install
