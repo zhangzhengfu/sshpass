@@ -106,7 +106,7 @@ static int parse_options(int argc, char *argv[]) {
     }
 
     args.vcode = getenv("SSHVCODE");
-    while ((opt = getopt(argc, argv, "+f:d:p:P:heVv")) != -1 && error == -1) {
+    while ((opt = getopt(argc, argv, "+f:d:p:P:heVvy")) != -1 && error == -1) {
         switch (opt) {
         case 'f':
             // Password should come from a file
