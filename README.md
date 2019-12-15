@@ -30,3 +30,9 @@ autoreconf -f -i
 ./configure --prefix=$HOME/app
 make -j && make install
 ```
+
+### Related Projects
+
+* https://github.com/Kxuan/sshpass OTP support
+* https://github.com/jctanner/sshpass passphrase prompt
+* https://github.com/liranms/sshpass support for 'ssh>' prompt
