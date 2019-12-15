@@ -456,6 +456,7 @@ int handleoutput(int fd) {
         if (!prevmatch) {
             if (args.verbose)
                 fprintf(stderr, "SSHPASS detected prompt. Sending password.\n");
+            usleep(1000);
             write_pass(fd);
             state1 = 0;
             prevmatch = 1;
