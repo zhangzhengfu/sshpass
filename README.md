@@ -34,5 +34,5 @@ make -j && make install
 ### Related Projects
 
 * https://github.com/Kxuan/sshpass OTP support
-* https://github.com/jctanner/sshpass passphrase prompt
-* https://github.com/liranms/sshpass support for 'ssh>' prompt
+* https://github.com/jctanner/sshpass Break on pem file passphrase prompt
+* https://github.com/liranms/sshpass Support for 'ssh>' prompt
