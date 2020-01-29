@@ -17,7 +17,7 @@ export SSHPASS=YOUR_SSH_PASSWORD
 sshpass -e -y ssh user@host
 ```
 
-For jump server, 
+For jump server, edit the `~/.ssh/config` file 
 
 ```sshconfig
 LogLevel ERROR
