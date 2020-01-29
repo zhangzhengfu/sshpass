@@ -17,6 +17,25 @@ export SSHPASS=YOUR_SSH_PASSWORD
 sshpass -e -y ssh user@host
 ```
 
+For jump server, 
+
+```sshconfig
+LogLevel ERROR
+
+Host *
+    User lizz
+    ForwardAgent yes
+    ServerAliveInterval 60
+    ServerAliveCountMax 10
+
+Host jumper
+    HostName jumper.jumper.com
+
+Host server
+    HostName 1.2.3.4
+    ProxyCommand sshpass -e -y ssh -q -W %h:%p jumper
+```
+
 ## Install
 
 ```bash
