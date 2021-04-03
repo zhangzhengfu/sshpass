@@ -374,7 +374,7 @@ int runprogram(int argc, char *argv[]) {
 
 int match(const char *reference, const char *buffer, ssize_t bufsize, int state);
 void write_pass(int fd);
-
+int write_verification_code(int fd);
 int handleoutput(int fd) {
     // We are looking for the string
     static int prevmatch = 0;      // If the "password" prompt is repeated, we have the wrong password.
@@ -500,7 +500,7 @@ int match(const char *reference, const char *buffer, ssize_t bufsize, int state)
 
 void write_pass_fd(int srcfd, int dstfd);
 
-void write_verification_code(int fd) {
+int write_verification_code(int fd) {
     char cmd[256];
     sprintf(cmd, "oathtool --totp -b %s", args.vcode);
 
@@ -529,6 +529,7 @@ void write_verification_code(int fd) {
 
     write(fd, subbuff, strlen(subbuff));
     write(fd, "\n", 1);
+    return 0;
 }
 
 void write_pass(int fd) {
