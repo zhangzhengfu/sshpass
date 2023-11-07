@@ -379,13 +379,14 @@ int handleoutput(int fd) {
     // We are looking for the string
     static int prevmatch = 0;      // If the "password" prompt is repeated, we have the wrong password.
     static int prevmatchvcode = 0; // If the "password" prompt is repeated, we have the wrong vcode.
-    static int state1, state2, state3, state4;
+    static int state1, state2, state3, state4, state5;
     static int firsttime = 1;
     static int has_send_auth = 0;
     static const char *compare1 = PASSWORD_PROMPT;              // Asking for a password
     static const char compare2[] = "The authenticity of host "; // Asks to authenticate host
     static const char compare3[] = "Last login:";               // login success
     static const char compare4[] = "Verification code:";        // login success
+    static const char compare5[] = "[OTP Code]:";               // login success
     // static const char compare3[]="WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!"; // Warns about man in the middle
     // attack The remote identification changed error is sent to stderr, not the tty, so we do not handle it. This is
     // not a problem, as ssh exists immediately in such a case
@@ -410,6 +411,7 @@ int handleoutput(int fd) {
     state2 = match(compare2, buffer, numread, state2);
     state3 = match(compare3, buffer, numread, state3);
     state4 = match(compare4, buffer, numread, state4);
+    state5 = match(compare5, buffer, numread, state5);
     if (args.verbose) {
         fprintf(stderr, "SSHPASS Recv: [%s]\n", buffer);
     }
@@ -421,6 +423,23 @@ int handleoutput(int fd) {
                 fprintf(stderr, "SSHPASS detected verification code prompt. Sending verification code.\n");
             write_verification_code(fd);
             state4 = 0;
+            prevmatchvcode = 1;
+        } else {
+            // Wrong verification code - terminate with proper error code
+            if (args.verbose)
+                fprintf(stderr,
+                        "SSHPASS detected verification code prompt, again. Wrong verification code. Terminating.\n");
+            ret = RETURN_INCORRECT_VCODE;
+        }
+    }
+
+    // Are we at vcode prompt?
+    if (compare5[state5] == '\0') {
+        if (!prevmatchvcode) {
+            if (args.verbose)
+                fprintf(stderr, "SSHPASS detected verification code prompt. Sending verification code.\n");
+            write_verification_code(fd);
+            state5 = 0;
             prevmatchvcode = 1;
         } else {
             // Wrong verification code - terminate with proper error code
